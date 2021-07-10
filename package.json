@@ -1,0 +1,14 @@
+{
+  "name": "med-consultation",
+  "version": "1.0.0",
+  "description": "Apis for medical consulation app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
