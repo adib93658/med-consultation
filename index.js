@@ -1,10 +1,27 @@
 var express = require('express');
+var admin = require('firebase-admin');
+var firebase = require('firebase');
+var http =require('http');
 var app = express();
+const cors = require('cors');
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
+var serviceAccount = require('./firebase-admin-creds.json');
+const server = http.Server(app);
+app.use(express.urlencoded({
+	extended: true
+}));
+app.use(express.json())
+app.use(cors({ origin: true }));
+
+
+app.post('/signup',require('./src/controllers/login.controller').signup);
+app.post('/login',require('./src/controllers/login.controller').login);
+server.listen(3000, function () {
+  admin.initializeApp({credential: admin.credential.cert(serviceAccount)});
+	firebase.initializeApp(require('./src/models/db').firebaseConfig);
+  console.log('listening on port http://127.0.0.1:3000 !');
 });
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
-});
+module.exports = {
+  app,
+};
