@@ -16,6 +16,10 @@ app.use(cors({ origin: true }));
 
 app.post('/signup',require('./src/controllers/login.controller').signup);
 app.post('/login',require('./src/controllers/login.controller').login);
+app.get('/getAllAccountRequests',require('./src/controllers/admin.controller').getAllAccountRequests);
+app.post('/acceptAccountRequest',require('./src/controllers/admin.controller').acceptAccountRequest);
+
+
 server.listen(3000, function () {
   admin.initializeApp({credential: admin.credential.cert(serviceAccount)});
 	firebase.initializeApp(require('./src/models/db').firebaseConfig);

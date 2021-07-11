@@ -1,56 +1,103 @@
-var admin = require('firebase-admin');
-var firebase = require('firebase');
-function signup (req, res)  {
-    console.log(req.body)
-    let email = req.body.email;
-    let password = req.body.password;
-    let role = req.body.role;
-    admin.auth().createUser({
-        email,
-        emailVerified: false,
-        password,
-    }).then((val)=>{
-        admin.firestore().collection('users').doc(val.uid).set({
+var admin = require("firebase-admin");
+var firebase = require("firebase");
+function signup(req, res) {
+  let email = req.body.email;
+  let password = req.body.password;
+  let role = req.body.role;
+  admin
+    .auth()
+    .createUser({
+      email,
+      emailVerified: false,
+      password
+    })
+    .then(
+      val => {
+        admin
+          .firestore()
+          .collection("users")
+          .doc(val.uid)
+          .set({
             role,
-            'accepted':false
-        }).then((val)=>{
-            res.status(200);
-             res.send({
-            "code":200,
-            "message":"User created successfully"
-        },(error)=>{
-            console.log(error);
-            res.send(error);
-        });
-        })
-        
-    },(error)=>{
+            email,
+            accepted: false
+          })
+          .then(
+            val => {
+              res.status(200).send({
+                code: 200,
+                message: "User created successfully"
+              });
+            },
+            error => {
+              console.log(error);
+              res.send(error);
+            }
+          );
+      },
+      error => {
+        console.log(error);
         res.send(error);
-    });
+      }
+    );
 }
 
-function login (req, res)  {
-    let email = req.body.email;
-    let password = req.body.password;
-    
-
-    firebase.auth().signInWithEmailAndPassword(email,password).then((userCredentials)=>{
-        let user =userCredentials.user;
-        admin.firestore().collection('users').doc(user.uid).get().then((details)=>{
-            console.log(details);
-            res.send({
+async function login(req, res) {
+  let email = req.body.email;
+  let password = req.body.password;
+  admin
+  .firestore().collection('users').where('email','==',email).get().then((val)=>{
+      if(val.docs.length==0){
+        res.status(404).send({
+          "message":"User not found"
+        });
+        return;
+      }
+      var user = val.docs[0].data();
+      if(!user.accepted){
+        res.status(404).send({
+          "message":"User not approved"
+        });
+        return;
+      }
+      firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then(
+      userCredentials => {
+        let user = userCredentials.user;
+        admin
+          .firestore()
+          .collection("users")
+          .doc(user.uid)
+          .get()
+          .then(
+            details => {
+              details = details.data();
+              res.status(200).send({
                 user,
                 details
-            })
-        },(error)=>{
-            res.send(error);
-        })
-        
-    },(error)=>{res.send(error); }
-    )
+              });
+            },
+            error => {
+              res.send(error);
+            }
+          );
+      },
+      error => {
+        res.send(error);
+      }
+    );
+      
+  },(error)=>{
+      console.log(error);
+      res.send(error);
+  });
+
+  
 }
 
 module.exports = {
-    login,
-    signup
-}
+  login,
+  signup
+};
