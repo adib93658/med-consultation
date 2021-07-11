@@ -93,11 +93,35 @@ async function login(req, res) {
       console.log(error);
       res.send(error);
   });
+}
 
-  
+function authenticate(req,res){
+  let token = req.body.token;
+  admin
+  .auth()
+  .verifyIdToken(token)
+  .then((decodedToken) => {
+    const uid = decodedToken.uid;
+    console.log(decodedToken);
+    // ...
+  })
+  .catch((error) => {
+    // Handle error
+    console.log(error);
+  });
+}
+function logout(req,res){
+  let uid = req.body.uid;
+  admin.auth().revokeRefreshTokens(uid).then((val)=>{
+    res.status(200).send({
+      message:"Logout successful"
+    })
+  })
 }
 
 module.exports = {
   login,
-  signup
+  signup,
+  logout,
+  authenticate
 };

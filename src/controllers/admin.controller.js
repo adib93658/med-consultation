@@ -5,7 +5,9 @@ function getAllAccountRequests(req, res) {
         (val)=>{
             let temp = []
             val.docs.forEach(element => {
-                temp.push(element.data())
+              let curr = element.data();
+              curr['uid']=element.id
+                temp.push(curr)
             });
             res.status(200).send(temp);
         }
@@ -13,12 +15,15 @@ function getAllAccountRequests(req, res) {
 }
 function acceptAccountRequest(req,res){
     var id = req.body.uid;
+    console.log(req)
     admin.firestore().collection('users').doc(id).update({
         'accepted':true
     }).then((val)=>{
         res.send(200).send({
             "message":"User accepted"
         })
+    },(error)=>{
+        console.log(error);
     })
 }
 
