@@ -20,7 +20,7 @@ app.post('/logout',require('./src/controllers/login.controller').logout);
 app.post('/authenticate',require('./src/controllers/login.controller').authenticate);
 app.get('/getAllAccountRequests',require('./src/controllers/admin.controller').getAllAccountRequests);
 app.post('/acceptAccountRequest',require('./src/controllers/admin.controller').acceptAccountRequest);
-
+app.get('/getAllDoctors',require('./src/controllers/patient.controller').getAllDoctors);
 
 server.listen(3000, function () {
   admin.initializeApp({credential: admin.credential.cert(serviceAccount)});
